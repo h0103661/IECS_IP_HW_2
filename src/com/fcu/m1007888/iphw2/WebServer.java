@@ -7,10 +7,20 @@ import java.util.* ;
 public final class WebServer
 {
 	/*
+	 * 測試網址
+	 * 
+	 * 因為沒有東西, 所以應該會回傳404
 	 * http://localhost:6789/
+	 * 
+	 * 顯示作業的網頁
 	 * http://localhost:6789/ip-hw2.htm
+	 * 
+	 * 顯示圖片
 	 * http://localhost:6789/img.jpeg
+	 * 
+	 * 顯示gif
 	 * http://localhost:6789/ip_hw_2.gif
+	 * 
 	 */
 	
 	public static void main(String argv[]) throws Exception
@@ -19,7 +29,8 @@ public final class WebServer
 		int port = 6789;
 		
 		// Establish the listen socket.
-		@SuppressWarnings("resource") //這個socket只有關閉程式時才需要關掉,加這個停止警告
+		// 這個socket只有關閉程式時才需要關掉,加這個停止警告
+		@SuppressWarnings("resource")
 		ServerSocket socket = new ServerSocket(port);
 		
 		// Process HTTP service requests in an infinite loop.
@@ -27,6 +38,7 @@ public final class WebServer
 			// Listen for a TCP connection request.
 			
 			// Construct an object to process the HTTP request message.
+			// server socket 接收到的 client socket
 			HttpRequest request = new HttpRequest(socket.accept());
 
 			// Create a new thread to process the request.
@@ -61,11 +73,12 @@ final class HttpRequest implements Runnable
 	private void processRequest() throws Exception
 	{
 		// Get a reference to the socket's input and output streams.
+		// 打開socket的input跟output
 		InputStream is = socket.getInputStream();
 		DataOutputStream os = new DataOutputStream(socket.getOutputStream());
 
 		// Set up input stream filters.
-		/*?*/ 
+		// 讀取socket的input 
 		BufferedReader br =  new BufferedReader(new InputStreamReader(is));
 		
 		// Get the request line of the HTTP request message.
@@ -97,11 +110,11 @@ final class HttpRequest implements Runnable
 		String contentTypeLine = null;
 		String entityBody = null;
 		if (fileExists) {
-			statusLine = "HTTP/1.1" + " " + "200" + " " + "OK"; //投影片p.35
+			statusLine = "HTTP/1.1" + " " + "200" + " " + "OK"; // 回傳狀態, 參考第二章投影片p.35
 			contentTypeLine = "Content-type: " + contentType( fileName ) + CRLF;
 		} else {
 			statusLine = "HTTP/1.1" + " " + "404" + " " + "Not Found";
-			contentTypeLine = "Content-type: " + contentType( fileName ) + CRLF;
+			contentTypeLine = "Content-type: " + "text/html" + CRLF; // 404不會回傳要求的檔案而是顯示錯誤訊息的網頁, 所以這邊type改成網頁
 			entityBody = "<HTML>" + 
 				"<HEAD><TITLE>Not Found</TITLE></HEAD>" +
 				"<BODY>Not Found</BODY></HTML>";
@@ -148,6 +161,7 @@ final class HttpRequest implements Runnable
 	     }
 	}
 	
+	// 根據作業說明倒數第二段, 圖片類是 image 分類
 	private static String contentType(String fileName)
 	{
 		if(fileName.endsWith(".htm") || fileName.endsWith(".html")) {
